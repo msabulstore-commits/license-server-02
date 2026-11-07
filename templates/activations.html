@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Activations</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="topbar">
+      <h1>Activations</h1>
+      <a href="/" class="btn-outline">← Back</a>
+    </header>
+
+    <section class="card">
+      <p class="key-display">Key: <code>{{ license_key }}</code></p>
+
+      {% if activations %}
+      <table>
+        <thead>
+          <tr>
+            <th>Machine ID</th>
+            <th>Activated At</th>
+            <th>Last Check</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in activations %}
+          <tr>
+            <td><code>{{ a.machine_id }}</code></td>
+            <td>{{ a.activated_at[:19].replace('T', ' ') }}</td>
+            <td>{{ a.last_check[:19].replace('T', ' ') if a.last_check else "—" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p class="empty">No activations yet for this key.</p>
+      {% endif %}
+    </section>
+  </div>
+</body>
+</html>

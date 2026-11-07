@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>License Admin</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="topbar">
+      <h1>🔑 License Manager</h1>
+      <a href="/logout" class="btn-outline">Logout</a>
+    </header>
+
+    <!-- Generate form -->
+    <section class="card">
+      <h2>Generate New License</h2>
+      <form method="POST" action="/generate" class="gen-form">
+        <div class="row">
+          <div class="field">
+            <label>Product ID</label>
+            <input type="text" name="product_id" value="MyApp-Pro" required />
+          </div>
+          <div class="field">
+            <label>Valid Days (0 = never)</label>
+            <input type="number" name="days_valid" value="365" min="0" />
+          </div>
+          <div class="field">
+            <label>Max Computers</label>
+            <input type="number" name="max_activations" value="1" min="1" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Customer Note (optional)</label>
+          <input type="text" name="customer_note" placeholder="John Doe / john@email.com" />
+        </div>
+        <button type="submit" class="btn-primary">Generate Key</button>
+      </form>
+    </section>
+
+    <!-- License list -->
+    <section class="card">
+      <h2>All Licenses ({{ licenses|length }})</h2>
+
+      {% if licenses %}
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>License Key</th>
+              <th>Product</th>
+              <th>Customer</th>
+              <th>Used</th>
+              <th>Expires</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for lic in licenses %}
+            <tr class="{% if not lic.is_active %}disabled{% endif %}">
+              <td><code class="key">{{ lic.license_key }}</code></td>
+              <td>{{ lic.product_id }}</td>
+              <td>{{ lic.customer_note or "—" }}</td>
+              <td>
+                <a href="/activations/{{ lic.license_key }}">{{ lic.used }} / {{ lic.max_activations }}</a>
+              </td>
+              <td>{{ lic.expires_at or "Never" }}</td>
+              <td>
+                {% if lic.is_active %}
+                  <span class="badge ok">Active</span>
+                {% else %}
+                  <span class="badge bad">Disabled</span>
+                {% endif %}
+              </td>
+              <td class="actions">
+                <a href="/toggle/{{ lic.id }}" class="btn-sm">
+                  {% if lic.is_active %}Disable{% else %}Enable{% endif %}
+                </a>
+                <a href="/delete/{{ lic.id }}" class="btn-sm danger"
+                   onclick="return confirm('Delete this license permanently?')">Delete</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="empty">No licenses yet. Generate your first one above.</p>
+      {% endif %}
+    </section>
+  </div>
+</body>
+</html>
